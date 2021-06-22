@@ -1,0 +1,33 @@
+{
+  "parser": "babel-eslint",
+  "plugins": [
+    "react-native", // for no-inline-styles rule
+  ],
+  "extends": [
+    "standard",
+    "standard-react",
+    "standard-jsx",
+    "plugin:react-hooks/recommended",
+    "plugin:react/recommended",
+    // "@react-native-community", // TODO: try to enable
+    "plugin:prettier/recommended", // removes all eslint rules that can mess up with prettier
+  ],
+  "rules": {
+    "react/jsx-handler-names": "off", // activated by standard-react config
+    "react/display-name": "off",
+    "react-native/no-inline-styles": "error",
+    "prettier/prettier": [
+      "warn",
+      {
+        "singleQuote": true,
+        "printWidth": 140,
+        "trailingComma": "all",
+        "arrowParens": "avoid"
+      }
+    ]
+  },
+  "env":{
+    "es6": true
+  },
+  "globals": { "fetch": false }
+}
