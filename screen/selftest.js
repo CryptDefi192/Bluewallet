@@ -57,11 +57,11 @@ export default class Selftest extends Component {
         await BlueElectrum.ping();
         await BlueElectrum.waitTillConnected();
         const addr4elect = '3GCvDBAktgQQtsbN6x5DYiQCMmgZ9Yk8BK';
-        const electrumBalance = await BlueElectrum.getBalanceByAddress(addr4elect);
+        const electrumBalance = await BlueElectrum.getBalanceByAddress(addr4elect, wallet._isIl);
         if (electrumBalance.confirmed !== 51432)
           throw new Error('BlueElectrum getBalanceByAddress failure, got ' + JSON.stringify(electrumBalance));
 
-        const electrumTxs = await BlueElectrum.getTransactionsByAddress(addr4elect);
+        const electrumTxs = await BlueElectrum.getTransactionsByAddress(addr4elect, wallet._isIl);
         if (electrumTxs.length !== 1) throw new Error('BlueElectrum getTransactionsByAddress failure, got ' + JSON.stringify(electrumTxs));
       } else {
         // skipping RN-specific test'

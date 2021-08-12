@@ -157,7 +157,7 @@ export class HDLegacyBreadwalletWallet extends HDLegacyP2PKHWallet {
     let lastChunkWithUsedAddressesNum = null;
     let lastHistoriesWithUsedAddresses = null;
     for (let c = 0; c < Math.round(endIndex / this.gap_limit); c++) {
-      const histories = await BlueElectrum.multiGetHistoryByAddress(gerenateChunkAddresses(c));
+      const histories = await BlueElectrum.multiGetHistoryByAddress(gerenateChunkAddresses(c), null, this._isIl);
       if (this.constructor._getTransactionsFromHistories(histories).length > 0) {
         // in this particular chunk we have used addresses
         lastChunkWithUsedAddressesNum = c;

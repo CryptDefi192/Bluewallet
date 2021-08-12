@@ -101,7 +101,7 @@ export class LegacyWallet extends AbstractWallet {
    */
   async fetchBalance() {
     try {
-      const balance = await BlueElectrum.getBalanceByAddress(this.getAddress());
+      const balance = await BlueElectrum.getBalanceByAddress(this.getAddress(), this._isIl);
       this.balance = Number(balance.confirmed);
       this.unconfirmed_balance = Number(balance.unconfirmed);
       this._lastBalanceFetch = +new Date();
@@ -117,7 +117,7 @@ export class LegacyWallet extends AbstractWallet {
    */
   async fetchUtxo() {
     try {
-      const utxos = await BlueElectrum.multiGetUtxoByAddress([this.getAddress()]);
+      const utxos = await BlueElectrum.multiGetUtxoByAddress([this.getAddress()], null, this._isIl);
       this.utxo = [];
       for (const arr of Object.values(utxos)) {
         this.utxo = this.utxo.concat(arr);
@@ -129,6 +129,7 @@ export class LegacyWallet extends AbstractWallet {
         this.utxo.map(u => u.txId),
         50,
         false,
+        this._isIl
       );
 
       const newUtxos = [];
@@ -244,7 +245,7 @@ export class LegacyWallet extends AbstractWallet {
     const addresses2fetch = [this.getAddress()];
 
     // first: batch fetch for all addresses histories
-    const histories = await BlueElectrum.multiGetHistoryByAddress(addresses2fetch);
+    const histories = await BlueElectrum.multiGetHistoryByAddress(addresses2fetch, null, this._isIl);
     const txs = {};
     for (const history of Object.values(histories)) {
       for (const tx of history) {
@@ -253,7 +254,7 @@ export class LegacyWallet extends AbstractWallet {
     }
 
     // next, batch fetching each txid we got
-    const txdatas = await BlueElectrum.multiGetTransactionByTxid(Object.keys(txs));
+    const txdatas = await BlueElectrum.multiGetTransactionByTxid(Object.keys(txs), null, true, this._isIl);
 
     // now, tricky part. we collect all transactions from inputs (vin), and batch fetch them too.
     // then we combine all this data (we need inputs to see source addresses and amounts)
@@ -263,7 +264,7 @@ export class LegacyWallet extends AbstractWallet {
         vinTxids.push(vin.txid);
       }
     }
-    const vintxdatas = await BlueElectrum.multiGetTransactionByTxid(vinTxids);
+    const vintxdatas = await BlueElectrum.multiGetTransactionByTxid(vinTxids, null, true, this._isIl);
 
     // fetched all transactions from our inputs. now we need to combine it.
     // iterating all _our_ transactions:
@@ -546,7 +547,7 @@ export class LegacyWallet extends AbstractWallet {
    * @returns {Promise<boolean>}
    */
   async wasEverUsed() {
-    const txs = await BlueElectrum.getTransactionsByAddress(this.getAddress());
+    const txs = await BlueElectrum.getTransactionsByAddress(this.getAddress(), this._isIl);
     return txs.length > 0;
   }
 }

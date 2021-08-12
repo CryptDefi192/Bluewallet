@@ -40,7 +40,7 @@ export class HDSegwitBech32Transaction {
    * @private
    */
   async _fetchTxhexAndDecode() {
-    const hexes = await BlueElectrum.multiGetTransactionByTxid([this._txid], 10, false);
+    const hexes = await BlueElectrum.multiGetTransactionByTxid([this._txid], 10, false, this._wallet._isIl);
     this._txhex = hexes[this._txid];
     if (!this._txhex) throw new Error("Transaction can't be found in mempool");
     this._txDecoded = bitcoin.Transaction.fromHex(this._txhex);
@@ -81,7 +81,7 @@ export class HDSegwitBech32Transaction {
    * @private
    */
   async _fetchRemoteTx() {
-    const result = await BlueElectrum.multiGetTransactionByTxid([this._txid || this._txDecoded.getId()]);
+    const result = await BlueElectrum.multiGetTransactionByTxid([this._txid || this._txDecoded.getId()], null, true, this._wallet._isIl);
     this._remoteTx = Object.values(result)[0];
   }
 
@@ -155,7 +155,7 @@ export class HDSegwitBech32Transaction {
       prevInputs.push(reversedHash);
     }
 
-    const prevTransactions = await BlueElectrum.multiGetTransactionByTxid(prevInputs);
+    const prevTransactions = await BlueElectrum.multiGetTransactionByTxid(prevInputs, null, true, this._wallet._isIl);
 
     // fetched, now lets count how much satoshis went in
     let wentIn = 0;

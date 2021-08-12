@@ -233,7 +233,7 @@ export class AbstractHDElectrumWallet extends AbstractHDWallet {
     }
 
     // first: batch fetch for all addresses histories
-    const histories = await BlueElectrum.multiGetHistoryByAddress(addresses2fetch);
+    const histories = await BlueElectrum.multiGetHistoryByAddress(addresses2fetch, null, this._isIl);
     const txs = {};
     for (const history of Object.values(histories)) {
       for (const tx of history) {
@@ -242,7 +242,7 @@ export class AbstractHDElectrumWallet extends AbstractHDWallet {
     }
 
     // next, batch fetching each txid we got
-    const txdatas = await BlueElectrum.multiGetTransactionByTxid(Object.keys(txs));
+    const txdatas = await BlueElectrum.multiGetTransactionByTxid(Object.keys(txs), null, true, this._isIl);
 
     // now, tricky part. we collect all transactions from inputs (vin), and batch fetch them too.
     // then we combine all this data (we need inputs to see source addresses and amounts)
@@ -252,7 +252,7 @@ export class AbstractHDElectrumWallet extends AbstractHDWallet {
         vinTxids.push(vin.txid);
       }
     }
-    const vintxdatas = await BlueElectrum.multiGetTransactionByTxid(vinTxids);
+    const vintxdatas = await BlueElectrum.multiGetTransactionByTxid(vinTxids, null, true, this._isIl);
 
     // fetched all transactions from our inputs. now we need to combine it.
     // iterating all _our_ transactions:
@@ -496,7 +496,7 @@ export class AbstractHDElectrumWallet extends AbstractHDWallet {
     let lastChunkWithUsedAddressesNum = null;
     let lastHistoriesWithUsedAddresses = null;
     for (let c = 0; c < Math.round(index / this.gap_limit); c++) {
-      const histories = await BlueElectrum.multiGetHistoryByAddress(gerenateChunkAddresses(c));
+      const histories = await BlueElectrum.multiGetHistoryByAddress(gerenateChunkAddresses(c), null, this._isIl);
       if (this.constructor._getTransactionsFromHistories(histories).length > 0) {
         // in this particular chunk we have used addresses
         lastChunkWithUsedAddressesNum = c;
@@ -554,7 +554,7 @@ export class AbstractHDElectrumWallet extends AbstractHDWallet {
       lagAddressesToFetch.push(this._getInternalAddressByIndex(c));
     }
 
-    const txs = await BlueElectrum.multiGetHistoryByAddress(lagAddressesToFetch); // <------ electrum call
+    const txs = await BlueElectrum.multiGetHistoryByAddress(lagAddressesToFetch, null, this._isIl); // <------ electrum call
 
     for (let c = this.next_free_address_index; c < this.next_free_address_index + this.gap_limit; c++) {
       const address = this._getExternalAddressByIndex(c);
@@ -590,7 +590,7 @@ export class AbstractHDElectrumWallet extends AbstractHDWallet {
       addresses2fetch.push(this._getInternalAddressByIndex(c));
     }
 
-    const balances = await BlueElectrum.multiGetBalanceByAddress(addresses2fetch);
+    const balances = await BlueElectrum.multiGetBalanceByAddress(addresses2fetch, this._isIl);
 
     // converting to a more compact internal format
     for (let c = 0; c < this.next_free_address_index + this.gap_limit; c++) {
@@ -671,7 +671,7 @@ export class AbstractHDElectrumWallet extends AbstractHDWallet {
 
     addressess = [...new Set(addressess)]; // deduplicate just for any case
 
-    const fetchedUtxo = await BlueElectrum.multiGetUtxoByAddress(addressess);
+    const fetchedUtxo = await BlueElectrum.multiGetUtxoByAddress(addressess, null, this._isIl);
     this._utxo = [];
     for (const arr of Object.values(fetchedUtxo)) {
       this._utxo = this._utxo.concat(arr);
@@ -1031,7 +1031,7 @@ export class AbstractHDElectrumWallet extends AbstractHDWallet {
    * @returns {Promise<boolean>}
    */
   async wasEverUsed() {
-    const txs = await BlueElectrum.getTransactionsByAddress(this._getExternalAddressByIndex(0));
+    const txs = await BlueElectrum.getTransactionsByAddress(this._getExternalAddressByIndex(0), this._isIl);
     return txs.length > 0;
   }
 

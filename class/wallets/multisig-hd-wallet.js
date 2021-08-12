@@ -904,6 +904,7 @@ export class MultisigHDWallet extends AbstractHDElectrumWallet {
       this.getUtxo(true).map(x => x.txid),
       50,
       false,
+      this._isIl
     );
 
     const newUtxos = [];

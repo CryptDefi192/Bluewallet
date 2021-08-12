@@ -89,7 +89,7 @@ export class AbstractHDWallet extends LegacyWallet {
       this.external_addresses_cache[this.next_free_address_index + c] = address; // updating cache just for any case
       let txs = [];
       try {
-        txs = await BlueElectrum.getTransactionsByAddress(address);
+        txs = await BlueElectrum.getTransactionsByAddress(address, this._isIl);
       } catch (Err) {
         console.warn('BlueElectrum.getTransactionsByAddress()', Err.message);
       }
@@ -127,7 +127,7 @@ export class AbstractHDWallet extends LegacyWallet {
       this.internal_addresses_cache[this.next_free_change_address_index + c] = address; // updating cache just for any case
       let txs = [];
       try {
-        txs = await BlueElectrum.getTransactionsByAddress(address);
+        txs = await BlueElectrum.getTransactionsByAddress(address, this._isIl);
       } catch (Err) {
         console.warn('BlueElectrum.getTransactionsByAddress()', Err.message);
       }

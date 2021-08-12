@@ -128,6 +128,7 @@ export class HDLegacyP2PKHWallet extends AbstractHDElectrumWallet {
       this.getUtxo().map(x => x.txid),
       50,
       false,
+      this._isIl
     );
 
     const newUtxos = [];
